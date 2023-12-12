@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Row</title>
+    
+    <!-- Include Bootstrap CSS (you can replace this link with your local Bootstrap file) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mt-4">Add Related Meeting of Meeting Information</h2>
+
+    <form method="post">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                {% for column, (column_name, column_type) in columns_info.items() %}
+                                    {% if column_name not in ['meeting_id', 'is_first_time', 'related_meeting'] %}
+                                        <th scope="col">{{ column_name.capitalize() }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                {% for column, (column_name, column_type) in columns_info.items() %}
+                                    {% if column_name not in ['meeting_id', 'is_first_time', 'related_meeting'] %}
+                                        <td>
+                                            {% if column_type == 'BOOLEAN' %}
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" {% if row[column_name] %}checked{% endif %} disabled>
+                                                    <label class="form-check-label" for="{{ column_name }}">Check if true</label>
+                                                </div>
+                                            {% elif column_type == 'DATETIME' %}
+                                                <p>{{ row[column_name] | default('') }}</p>
+                                                <!-- Include necessary datepicker scripts -->
+                                            {% else %}
+                                                <p>{{ row[column_name] | default('') }}</p>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="mt-4">Meeting Information:</h2>
+        {% for column, (column_name, column_type) in columns_info.items() %}
+            {% if column_name not in ['meeting_id', 'is_first_time', 'related_meeting'] %}
+                <div class="form-group">
+                    <label for="{{ column_name }}">{{ column_name.capitalize() }}:</label>
+                
+                    {% if column_type == 'BOOLEAN' %}
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="{{ column_name }}" name="{{ column_name }}" {% if row[column_name] %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ column_name }}">Check if true</label>
+                        </div>
+                        <!-- This case will not be possible because the column is_first_time had been filter out -->
+                    {% elif column_type == 'DATETIME' %}
+                        <input type="text" class="form-control datepicker" id="{{ column_name }}" name="{{ column_name }}" >
+                        <!-- Include necessary datepicker scripts -->
+                    {% else %}
+                        {# Show an empty string if the value in the row is None #}
+                        <input type="text" class="form-control" id="{{ column_name }}" name="{{ column_name }}">
+                    {% endif %}
+                    
+                </div>
+                {% endif %}
+    {% endfor %}
+    
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+
+    </form>
+</div>
+
+<!-- Include Bootstrap JS (optional) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- Include Datepicker JS (if using datetime field) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+    // JavaScript function to cancel the form and go back to the index page
+    function cancelForm() {
+        // Redirect to the index page
+        window.location.href = '/';  // Replace '/index' with the actual URL of your index page
+    }     
+    $(document).ready(function(){
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+
+</body>
+</html>
